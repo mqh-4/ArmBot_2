@@ -1,16 +1,16 @@
-# ArmPi FPV
+# ArmBot
 
 [English](https://github.com/Hiwonder/ArmPi-FPV/blob/main/README.md) | 中文
 
 <p align="center">
-  <img src="./sources/images/armpi-fpv.png" alt="ArmPi FPV Logo" width="600"/>
+  <img src="./sources/images/armpi-fpv.png" alt="Hiwonder ArmPi FPV hardware logo" width="600"/>
 </p>
 
-基于树莓派的智能视觉机械臂，搭载高清170°广角摄像头，集成ROS和MoveIt运动学，支持人脸识别、颜色追踪、码垛、智慧仓储等多种AI视觉功能。
+ArmBot 是一个使用机械臂和 RGB-D 深度相机实现水果识别、定位、抓取与放置的 ROS Noetic 项目。当前相机配置为 Orbbec Astra Pro Plus，机械臂硬件面向 Hiwonder ArmPi FPV 兼容设备。为保持兼容性，ROS 包名和 launch 名称沿用上游命名。
 
 ## 产品介绍
 
-ArmPi FPV智能视觉机械臂以树莓派5/树莓派4B为主控，OpenCV为图像处理库，搭载高清170°广角摄像头，拥有第一视觉。它采用ROS机器人操作系统，内置MoveIt运动学。通过Python编程，它可以实现人脸识别、颜色追踪、码垛、智慧仓储等多种AI视觉识别功能！它不仅能满足用户对机器视觉、机械臂运动控制、力矩控制等算法的学习和验证，还为手眼协作、视觉抓取等二次开发提供快速、便捷的集成方案。
+ArmBot 使用 YOLO 识别配置的水果类别，通过彩色图像和深度图像估计目标的三维位置，再由机械臂完成抓取和放置。手眼标定结果用于将相机坐标转换到机械臂基坐标。当前项目流程聚焦水果抓放，不包含码垛功能。
 
 ## 官方资源
 
@@ -22,38 +22,20 @@ ArmPi FPV智能视觉机械臂以树莓派5/树莓派4B为主控，OpenCV为图�
 
 ## 主要功能
 
-### AI视觉功能
-- **人脸检测** - 全面的人脸识别能力
-- **颜色追踪** - 实时基于颜色的目标追踪
-- **目标追踪** - 先进的物体检测和追踪
-- **视觉抓取** - 手眼协调精确物体操作
-- **AprilTag识别** - 基于标签的精确定位
+### RGB-D水果识别与定位
+- **水果检测** - 使用 YOLO 识别配置的水果类别
+- **三维定位** - 融合彩色图像和深度图像估计目标位置
+- **手眼标定** - 将相机坐标转换到机械臂基坐标
 
-### 高级应用
-- **物品码垛** - 自动化堆叠和码垛操作
-- **智慧仓储** - 智能仓库管理和分拣
-- **物品分拣** - 基于颜色和形状的分拣自动化
-- **多机群控** - 多台机械臂协同控制
-- **语音控制** - ASR驱动的语音命令
-
-### 运动控制
-- **逆运动学** - 先进的运动规划算法
-- **MoveIt集成** - 完整的MoveIt运动规划支持
-- **力矩控制** - 精确的力和力矩管理
-- **轨迹规划** - 平滑的路径生成和执行
-- **舵机控制** - 高精度总线舵机管理
-
-### 编程接口
-- **ROS集成** - 完整的机器人操作系统支持
-- **Python编程** - 全面的Python SDK
-- **MoveIt API** - 运动规划和控制接口
-- **OpenCV库** - 计算机视觉和图像处理
-- **开源平台** - 完整的开源平台支持定制化
+### 机械臂抓取与放置
+- **水果抓放流程** - 执行配置的抓取和放置动作
+- **机械臂控制** - 使用现有 ROS 控制器、舵机驱动和运动学
+- **ROS Noetic** - 运行相机、感知和操作流程
 
 ## 硬件配置
 - **处理器**: 树莓派5或树莓派4B
 - **操作系统**: ROS Noetic兼容Linux系统
-- **视觉系统**: 高清170°广角摄像头
+- **深度相机**: Orbbec Astra Pro Plus RGB-D 相机
 - **舵机**: 高精度总线舵机
 - **自由度**: 多自由度机械臂
 - **通信**: WiFi、蓝牙
@@ -61,43 +43,32 @@ ArmPi FPV智能视觉机械臂以树莓派5/树莓派4B为主控，OpenCV为图�
 ## 项目结构
 
 ```
-armpi_fpv/
-├── src/                          # ROS源码包
-│   ├── armpi_fpv_bringup/        # 系统启动和配置
-│   ├── armpi_fpv_common/         # 公共工具和库
-│   ├── armpi_fpv_descrption/     # 机器人URDF描述
-│   ├── armpi_fpv_kinematics/     # 运动学算法
-│   ├── armpi_fpv_moveit_config/  # MoveIt配置
-│   ├── asr_control/              # 语音控制模块
-│   ├── desk_cleaning/            # 桌面清理与Gazebo仿真
-│   ├── face_detect/              # 人脸检测
-│   ├── hiwonder_servo_controllers/ # 舵机控制器
-│   ├── hiwonder_servo_driver/    # 舵机硬件驱动
-│   ├── hiwonder_servo_msgs/      # 舵机消息定义
-│   ├── lab_config/               # 颜色标定配置
-│   ├── multi_control/            # 多机器人控制
-│   ├── object_pallezting/        # 码垛应用
-│   ├── object_sorting/           # 物品分拣应用
-│   ├── object_tracking/          # 物体追踪应用
-│   ├── ros_robot_controller/     # 硬件控制器接口
-│   └── warehouse/                # 智慧仓储应用
-├── build/                        # 编译文件
-├── devel/                        # 开发文件
+ArmBot/
+├── Dockerfile
+├── docker-compose.yml
+├── config/                        # 相机配置
+├── models/                        # 检测模型
+├── src/
+│   ├── desk_cleaning/             # RGB-D 水果识别与抓放
+│   ├── orbbec_camera/             # 深度相机驱动
+│   ├── ros_robot_controller/      # 机械臂控制接口
+│   ├── hiwonder_servo_*/          # 舵机控制和消息
+│   └── armpi_fpv_*/               # 机器人描述和运动学
 └── sources/                      # 资源和文档
 ```
 
-## 桌面清理扩展
+`src` 中还保留其他上游 ROS 示例包，但它们不属于水果抓放主流程。
 
-仓库中的 `desk_cleaning` ROS 包增加了 USB 麦克风与 whisper.cpp 离线语音识别、语音任务理解、
-YOLO ONNX 目标检测、RGB-D 三维定位、Gazebo 桌面仿真、自动抓放和逐件语音反馈。详细的
-语音、仿真、相机接入、标定、训练与运行说明见
+## 水果抓取与放置流程
+
+仓库中的 `desk_cleaning` ROS 包实现 YOLO ONNX 水果检测、RGB-D 三维定位和机械臂抓放。详细的相机接入、标定、训练与运行说明见
 [`src/desk_cleaning/README_cn.md`](src/desk_cleaning/README_cn.md)。
 
 项目已附带一份可直接打印的 ChArUco 眼在手上标定板，位于
 [`sources/calibration/`](sources/calibration/)。
 
 ## 版本信息
-- **当前版本**: ArmPi FPV v1.0.0
+- **当前版本**: ArmBot v1.0.0（兼容 ArmPi FPV）
 - **支持平台**: 树莓派5、树莓派4B
 - **ROS版本**: ROS1 (Noetic)
 
@@ -109,4 +80,4 @@ YOLO ONNX 目标检测、RGB-D 三维定位、Gazebo 桌面仿真、自动抓放
 
 ---
 
-**注**: 所有程序已预装在ArmPi FPV机器人系统中，可直接运行。详细使用教程请参考[官方文档](https://docs.hiwonder.com/projects/ArmPi_FPV/en/latest/)。
+**注**: ArmBot 面向 Hiwonder ArmPi FPV 硬件运行。硬件使用说明请参考[官方文档](https://docs.hiwonder.com/projects/ArmPi_FPV/en/latest/)。

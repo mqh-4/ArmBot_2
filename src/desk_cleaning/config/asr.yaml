@@ -1,15 +1,13 @@
 commands:
-  "1": "清理桌面"
+  "1": "开始作业"
   "2": "停止清理"
   "3": "继续清理"
-  "4": "清理笔和橡皮"
 
 # Set configure_vocabulary to true once to program the hardware ASR module,
 # then set it back to false because the module stores its vocabulary.
 configure_vocabulary: false
 mode: 1
 vocabulary:
-  "1": "qing li zhuo mian"
+  "1": "kai shi zuo ye"
   "2": "ting zhi qing li"
   "3": "ji xu qing li"
-  "4": "qing li bi he xiang pi"

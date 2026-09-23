@@ -1,7 +1,7 @@
 model:
   # Official Ultralytics YOLOv8s pretrained on COCO. The class order must
   # exactly match the model's 80 output classes.
-  path: "/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"
+  path: "/home/ubuntu/share/tmp/ArmBot/models/yolov8s.onnx"
   labels:
     [person, bicycle, car, motorcycle, airplane, bus, train, truck, boat,
      traffic light, fire hydrant, stop sign, parking meter, bench, bird, cat,

@@ -2,11 +2,11 @@
   <arg name="image_topic" default="/astra/color/image_raw"/>
   <arg name="camera_info_topic" default="/astra/color/camera_info"/>
   <arg name="mode" default="collect"/>
-  <arg name="result" default="/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json"/>
+  <arg name="result" default="/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json"/>
   <arg name="base_frame" default="base_link"/>
   <!-- link5 is the rigid wrist/flange reference after the gripper is removed. -->
   <arg name="end_frame" default="link5"/>
-  <arg name="samples" default="/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_samples.json"/>
+  <arg name="samples" default="/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_samples.json"/>
   <arg name="target_samples" default="15"/>
   <arg name="allow_motion" default="false"/>
   <arg name="step_pulse" default="15"/>

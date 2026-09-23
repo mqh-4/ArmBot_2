@@ -27,7 +27,7 @@ class DeskVisualizer:
         self.smoothed_fps = 0.0
         self.last_display = None
 
-        self.window_name = rospy.get_param('~window_name', 'ArmPi-FPV Camera')
+        self.window_name = rospy.get_param('~window_name', 'ArmBot Camera')
         self.window_width = int(rospy.get_param('~window_width', 960))
         self.window_height = int(rospy.get_param('~window_height', 720))
         # The detector is intentionally throttled on the Pi. Keep the last
@@ -36,10 +36,10 @@ class DeskVisualizer:
         self.show_guide = bool(rospy.get_param('~show_guide', True))
         self.snapshot_path = os.path.expanduser(rospy.get_param(
             '~snapshot_path',
-            '/home/ubuntu/share/tmp/ArmPi-FPV/output/visualizer_snapshot.jpg',
+            '/home/ubuntu/share/tmp/ArmBot/output/visualizer_snapshot.jpg',
         ))
         self.target_classes = set(rospy.get_param(
-            '~target_classes', ['toothbrush', 'spoon', 'apple', 'orange', 'banana'],
+            '~target_classes', ['apple', 'orange', 'banana'],
         ))
         workspace = rospy.get_param('~workspace', {})
         self.workspace = Workspace(

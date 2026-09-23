@@ -2,8 +2,8 @@
 <package format="2">
   <name>desk_cleaning</name>
   <version>0.1.0</version>
-  <description>Voice-driven RGB-D desk cleaning for ArmPi FPV.</description>
-  <maintainer email="maintainer@example.com">ArmPi FPV Maintainer</maintainer>
+  <description>Voice-driven RGB-D desk cleaning for ArmBot on ArmPi FPV-compatible hardware.</description>
+  <maintainer email="maintainer@example.com">ArmBot Maintainer</maintainer>
   <license>BSD-3-Clause</license>
 
   <buildtool_depend>catkin</buildtool_depend>

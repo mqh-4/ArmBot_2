@@ -1,6 +1,6 @@
 services:
   armpi_fpv:
-    image: armpi-fpv:noetic
+    image: armbot:noetic
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,12 +10,12 @@ services:
     volumes:
       - /dev:/dev
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./src:/home/ubuntu/share/tmp/ArmPi-FPV/src
-      - ./config:/home/ubuntu/share/tmp/ArmPi-FPV/config
-      - ./models:/home/ubuntu/share/tmp/ArmPi-FPV/models
-      - ./output:/home/ubuntu/share/tmp/ArmPi-FPV/output
-      - ./tmp:/home/ubuntu/share/tmp/ArmPi-FPV/tmp
-    working_dir: /home/ubuntu/share/tmp/ArmPi-FPV
+      - ./src:/home/ubuntu/share/tmp/ArmBot/src
+      - ./config:/home/ubuntu/share/tmp/ArmBot/config
+      - ./models:/home/ubuntu/share/tmp/ArmBot/models
+      - ./output:/home/ubuntu/share/tmp/ArmBot/output
+      - ./tmp:/home/ubuntu/share/tmp/ArmBot/tmp
+    working_dir: /home/ubuntu/share/tmp/ArmBot
     command: ["bash", "-lc", "source devel/setup.bash && exec bash"]
     stdin_open: true
     tty: true

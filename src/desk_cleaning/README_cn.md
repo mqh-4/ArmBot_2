@@ -1,28 +1,12 @@
-# ArmPi 桌面清理机器人
+# ArmBot 水果识别与抓放
 
-`desk_cleaning` 在 ArmPi FPV 原有舵机控制和运动学之上增加了自然语言任务解析、
-YOLO ONNX 目标检测、RGB-D 三维定位、抓取任务状态机和逐件语音反馈。
+ROS 包名 `desk_cleaning` 为兼容上游接口而保留。ArmBot 当前主流程使用 YOLO、RGB-D 深度和手眼标定，完成苹果、橙子、香蕉的识别、定位、抓取与放置。
 
 ## 当前支持范围
 
-第一版面向固定桌面、安装在机械臂腕部的深度相机和一个收纳盒。默认配置支持签字笔、铅笔、
-橡皮、尺子、订书机和便签本；手机、水杯、剪刀默认禁止抓取。所有运动默认是
-`dry_run`，完成相机标定、工作空间测量和单物体验证前不会向机械臂发送动作。
+`config/objects.yaml` 只启用苹果、橙子和香蕉，其余类别均不可抓取。Orbbec Astra Pro Plus 固定在机械臂外部，使用 eye-to-hand 标定。所有运动默认是 `dry_run`；完成相机标定、工作空间测量和单物体验证前，不会向实体机械臂发送动作。
 
-系统支持这些文本命令：
-
-```text
-清理桌面
-只清理笔和橡皮
-清理桌面，但不要碰手机
-清理两个物品
-停止清理
-继续清理
-清理进度
-```
-
-固定命令优先由本地规则解析；规则不能理解时才选择性调用本地小语言模型。语言模型
-只能生成受白名单约束的清理任务，不能控制关节或生成坐标。
+语音/文本任务规划是可选入口；无论使用哪种入口，执行器都只接受配置中启用的水果类别。
 
 ## 本地语言模型
 
@@ -98,29 +82,29 @@ CameraInfo 内参、近距离最小深度以及 USB 供电要求。若只有厂�
 
 ## 目标检测模型
 
-仓库没有提交完整的桌面专用模型权重。当前默认优先尝试 `yolov8s.onnx`，如果部署目录中还没有
+仓库没有提交完整的水果专用模型权重。当前默认优先尝试 `yolov8s.onnx`，如果部署目录中还没有
 该文件，感知节点会自动回退到同目录已有的 `yolov8n.onnx` 并打印警告。把同样类别顺序的
 YOLOv8s ONNX 文件放到 `models/yolov8s.onnx` 后即可直接启用，不需要改代码。
 
-需要使用真实相机和实际桌面采集数据，标注并训练以下类别：
+如需训练专用模型，请使用真实相机和实际水果场景采集数据，标注以下类别：
 
 ```text
-pen pencil eraser ruler scissors stapler notebook phone cup
+apple orange banana
 ```
 
-建议至少覆盖：不同桌面颜色、白天/夜间灯光、目标旋转、部分遮挡、空桌面和机械臂进入
-画面的负样本。训练完成后导出 YOLOv8 风格 ONNX，输入大小默认 `640x640`。类别顺序必须
-与 [perception.yaml](config/perception.yaml) 完全一致。
+建议至少覆盖：不同背景和光照、目标旋转、部分遮挡、空桌面和机械臂进入
+画面的负样本。训练完成后导出 YOLOv8 风格 ONNX，输入大小默认 `640x640`。当前配置使用
+COCO 80 类顺序；若使用三分类模型，需把 `perception.yaml` 中的 `labels` 改为模型输出顺序。
 
 模型部署示例：
 
 ```bash
 roslaunch desk_cleaning desk_cleaning.launch \
-  model_path:=/home/ubuntu/models/desk_objects.onnx \
+  model_path:=/home/ubuntu/models/fruit.onnx \
   start_arm:=false dry_run:=true
 ```
 
-## 桌面 ROI 裁剪
+## 工作区域 ROI 裁剪
 
 感知节点默认只在彩色图的桌面区域运行检测，减少背景和机械臂对 YOLO 的干扰。ROI 在
 `config/perception.yaml` 中用 0 到 1 的归一化比例配置：
@@ -210,7 +194,9 @@ catkin_make
 source devel/setup.bash
 ```
 
-### Gazebo 完整仿真
+### 旧版桌面 Gazebo 示例
+
+以下场景使用文具模型，不属于当前水果抓放主流程，也不作为当前功能验收方式。
 
 安装 ROS Noetic 对应组件：
 
@@ -219,7 +205,7 @@ sudo apt install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control \
   ros-noetic-ros-controllers
 ```
 
-默认仿真包含 ArmPi、桌面、左右收纳区、签字笔、橡皮、便签本和一台腕部 RGB-D 相机。
+此 Gazebo 场景是保留的旧桌面示例，不代表当前水果抓放主流程；当前主流程以外置 Astra RGB-D 相机和实体机械臂为准。
 它使用 Gazebo 真值输出代替检测网络，因此不需要 ONNX 权重就能先验证语音、任务状态机、
 逆运动学、舵机指令桥接、抓放和逐件播报：
 

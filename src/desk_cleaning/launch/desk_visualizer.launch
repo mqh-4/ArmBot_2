@@ -1,7 +1,7 @@
 <launch>
   <arg name="image_topic" default="/astra/color/image_raw"/>
   <arg name="objects_topic" default="/desk_perception/objects"/>
-  <arg name="window_name" default="ArmPi-FPV Camera"/>
+  <arg name="window_name" default="ArmBot Camera"/>
   <arg name="window_width" default="960"/>
   <arg name="window_height" default="720"/>
 
@@ -16,6 +16,6 @@
     <param name="show_guide" value="false"/>
     <param name="objects_timeout" value="8.0"/>
     <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
-    <rosparam param="target_classes">[toothbrush, spoon, apple, orange, banana]</rosparam>
+    <rosparam param="target_classes">[apple, orange, banana]</rosparam>
   </node>
 </launch>

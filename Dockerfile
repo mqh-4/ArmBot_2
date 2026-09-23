@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG CATKIN_BUILD_JOBS=2
 
 ENV ROS_DISTRO=noetic \
-    ROS_WS=/home/ubuntu/share/tmp/ArmPi-FPV
+    ROS_WS=/home/ubuntu/share/tmp/ArmBot
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR ${ROS_WS}

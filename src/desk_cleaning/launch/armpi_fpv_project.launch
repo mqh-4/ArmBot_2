@@ -1,8 +1,8 @@
-<!-- Single entry point for the ArmPi-FPV desk-cleaning project. -->
+<!-- Single entry point for the ArmBot desk-cleaning project. -->
 <launch>
   <arg name="start_arm" default="true"/>
   <arg name="dry_run" default="true"/>
-  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"/>
+  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmBot/models/yolov8s.onnx"/>
   <!-- Keep the external Astra frames separate from the legacy arm-mounted camera_link. -->
   <arg name="camera_name" default="astra"/>
   <arg name="color_topic" default="/astra/color/image_raw"/>
@@ -11,7 +11,7 @@
   <arg name="camera_root_frame" default="astra_link"/>
   <arg name="camera_frame" default="astra_color_optical_frame"/>
   <arg name="publish_eye_to_hand_tf" default="true"/>
-  <arg name="eye_to_hand_result" default="/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json"/>
+  <arg name="eye_to_hand_result" default="/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json"/>
   <arg name="depth_registration" default="true"/>
   <arg name="enable_ir" default="false"/>
   <arg name="enable_point_cloud" default="false"/>

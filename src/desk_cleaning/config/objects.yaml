@@ -3,12 +3,12 @@ objects:
     display_name: "牙刷"
     aliases: ["牙刷", "toothbrush"]
     grasp_profile: slim
-    enabled: true
+    enabled: false
   spoon:
     display_name: "塑料勺"
     aliases: ["勺子", "塑料勺", "汤勺", "spoon"]
     grasp_profile: slim
-    enabled: true
+    enabled: false
   apple:
     display_name: "苹果"
     aliases: ["苹果", "仿真苹果", "apple"]

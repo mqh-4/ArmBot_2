@@ -484,9 +484,9 @@ def run_solver(args):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=('collect', 'solve', 'validate'), default='collect')
-    parser.add_argument('--samples', default='/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_samples.json')
-    parser.add_argument('--output', default='/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json')
-    parser.add_argument('--result', default='/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json')
+    parser.add_argument('--samples', default='/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_samples.json')
+    parser.add_argument('--output', default='/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json')
+    parser.add_argument('--result', default='/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json')
     parser.add_argument('--image-topic', default='/camera/color/image_raw')
     parser.add_argument('--camera-info-topic', default='/camera/color/camera_info')
     parser.add_argument('--base-frame', default='base_link')

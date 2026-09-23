@@ -178,7 +178,7 @@ def parse_command(
     if any(word in normalized for word in ('状态', '进度', '怎么样了', 'status')):
         return CleanupCommand(intent='status')
     # "开始作业" is the dedicated fruit-to-box command for this deployment. It
-    # deliberately excludes other enabled classes such as toothbrush/spoon.
+    # deliberately limits this intent to the supported fruit classes.
     if '开始作业' in normalized:
         fruit_classes = [
             class_name for class_name in ('apple', 'orange', 'banana')

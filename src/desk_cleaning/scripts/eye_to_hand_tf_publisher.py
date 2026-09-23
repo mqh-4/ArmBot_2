@@ -33,7 +33,7 @@ def main():
     rospy.init_node('eye_to_hand_tf_publisher')
     result_path = rospy.get_param(
         '~result',
-        '/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json',
+        '/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json',
     )
     base_frame = rospy.get_param('~base_frame', 'base_link')
     camera_root_frame = rospy.get_param('~camera_root_frame', 'astra_link')

@@ -1,7 +1,7 @@
 <launch>
   <arg name="start_arm" default="true"/>
   <arg name="dry_run" default="true"/>
-  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"/>
+  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmBot/models/yolov8s.onnx"/>
   <!-- Default profile for Orbbec Astra Pro Plus ROS1/OpenNI drivers. -->
   <arg name="color_topic" default="/astra/color/image_raw"/>
   <arg name="depth_topic" default="/astra/depth/image_raw"/>
@@ -37,13 +37,9 @@
     <env name="PYTHONPATH" value="/home/ubuntu/.local/lib/python3.8/site-packages:$(optenv PYTHONPATH)"/>
     <rosparam file="$(find desk_cleaning)/config/perception.yaml" command="load"/>
     <rosparam param="display_names">
-      toothbrush: 牙刷
-      spoon: 塑料勺
-      fork: 塑料叉
       apple: 苹果
       orange: 橙子
       banana: 香蕉
-      remote: 遥控器
     </rosparam>
     <param name="model/path" value="$(arg model_path)"/>
     <param name="camera/color_topic" value="$(arg color_topic)"/>

@@ -24,8 +24,8 @@ while 1:
         v.TTSModuleSpeak("[h2][v10]", "你好，Hiwonder")
         time.sleep(3) # 必要延时，等待播放完成
     if data == 3:
-        print("我是Arm Pi FPV") 
+        print("我是ArmBot")
         v = TTS()
-        v.TTSModuleSpeak("[h2][v10]", "我是ArmPi FPV")
+        v.TTSModuleSpeak("[h2][v10]", "我是ArmBot")
         time.sleep(3) # 必要延时，等待播放完成
     time.sleep(0.01)
