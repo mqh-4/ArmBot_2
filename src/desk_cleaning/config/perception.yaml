@@ -1,0 +1,77 @@
+model:
+  # Official Ultralytics YOLOv8s pretrained on COCO. The class order must
+  # exactly match the model's 80 output classes.
+  path: "/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"
+  labels:
+    [person, bicycle, car, motorcycle, airplane, bus, train, truck, boat,
+     traffic light, fire hydrant, stop sign, parking meter, bench, bird, cat,
+     dog, horse, sheep, cow, elephant, bear, zebra, giraffe, backpack,
+     umbrella, handbag, tie, suitcase, frisbee, skis, snowboard, sports ball,
+     kite, baseball bat, baseball glove, skateboard, surfboard, tennis racket,
+     bottle, wine glass, cup, fork, knife, spoon, bowl, banana, apple, sandwich,
+     orange, broccoli, carrot, hot dog, pizza, donut, cake, chair, couch,
+     potted plant, bed, dining table, toilet, tv, laptop, mouse, remote,
+     keyboard, cell phone, microwave, oven, toaster, sink, refrigerator, book,
+     clock, vase, scissors, teddy bear, hair drier, toothbrush]
+  input_width: 640
+  input_height: 640
+  # Show lower-confidence candidates while tuning the camera scene. The
+  # executor independently keeps its 0.55 safety threshold for grasping.
+  confidence_threshold: 0.20
+  fallback_red_apple: true
+  fallback_confidence: 0.50
+  nms_threshold: 0.45
+  max_fps: 5.0
+  opencv_threads: 2
+
+camera:
+  # Topics published by the Orbbec Astra Pro Plus ROS1 driver.
+  color_topic: /camera/color/image_raw
+  depth_topic: /camera/depth/image_raw
+  camera_info_topic: /camera/color/camera_info
+  depth_scale: 0.001
+  depth_min: 0.12
+  depth_max: 1.20
+  depth_roi_ratio: 0.25
+  # If the centre and inner fruit ROI are empty, recover from valid pixels in
+  # the full fruit bbox. This handles Astra depth holes without accepting an
+  # RGB-only target.
+  fruit_depth_recovery_ratio: 1.0
+  # Center-pixel depth on a round object is its front surface. Estimate the
+  # apple center by adding half its apparent bbox diameter along the camera ray.
+  center_estimation:
+    apple: sphere_bbox
+    orange: sphere_bbox
+    banana: thin_bbox
+  # Red tape is the authoritative box boundary. It is visualized and measured
+  # in base_link but is never a grasp target or an apple fallback candidate.
+  box_marker:
+    enabled: true
+    mode: red_boundary
+    class_name: apple_box
+    min_width_px: 80
+    min_height_px: 60
+    min_area_px: 80
+    max_area_px: 12000
+    min_circularity: 0.72
+    min_radius_px: 5
+    # The wall hides part of the U-shaped tape from the external camera.
+    # A long visible edge is extended toward the wall as a conservative
+    # no-grasp region; the recorded box centre remains the placement target.
+    partial_edge_enabled: true
+    wall_side: right
+    partial_edge_min_length_px: 70
+    partial_edge_max_width_px: 28
+    partial_edge_margin_px: 8
+    partial_edge_max_jump_px: 30
+    partial_edge_hold_sec: 0.8
+    partial_edge_smoothing: 0.20
+  # Detect only the desk area. Values are normalized to the incoming color
+  # image and can be tuned without changing code.
+  roi_enabled: true
+  desktop_roi:
+    x_min: 0.05
+    y_min: 0.20
+    x_max: 0.95
+    y_max: 0.98
+  target_frame: base_link

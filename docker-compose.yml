@@ -1,0 +1,21 @@
+services:
+  armpi_fpv:
+    image: armpi-fpv:noetic
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+    volumes:
+      - /dev:/dev
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./src:/home/ubuntu/share/tmp/ArmPi-FPV/src
+      - ./config:/home/ubuntu/share/tmp/ArmPi-FPV/config
+      - ./models:/home/ubuntu/share/tmp/ArmPi-FPV/models
+      - ./output:/home/ubuntu/share/tmp/ArmPi-FPV/output
+      - ./tmp:/home/ubuntu/share/tmp/ArmPi-FPV/tmp
+    working_dir: /home/ubuntu/share/tmp/ArmPi-FPV
+    command: ["bash", "-lc", "source devel/setup.bash && exec bash"]
+    stdin_open: true
+    tty: true

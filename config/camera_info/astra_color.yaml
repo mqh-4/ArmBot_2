@@ -1,0 +1,23 @@
+image_width: 640
+image_height: 480
+camera_name: astra_color
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [546.1300049, 0.0, 311.6621704, 0.0, 546.1300049, 241.4677734, 0.0,
+  0.0, 1.0]
+distortion_model: rational_polynomial
+distortion_coefficients:
+  rows: 1
+  cols: 8
+  data: [0.08234844, -0.05871824, -0.00308948, -0.00104329, -0.17370078, 0.0,
+  0.0, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [546.1300049, 0.0, 311.6621704, 0.0, 0.0, 546.1300049, 241.4677734,
+  0.0, 0.0, 0.0, 1.0, 0.0]

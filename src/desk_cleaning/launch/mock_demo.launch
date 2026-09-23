@@ -1,0 +1,22 @@
+<launch>
+  <node pkg="desk_cleaning" type="mock_perception_node.py" name="mock_desk_perception" output="screen"/>
+
+  <node pkg="desk_cleaning" type="desk_cleaning_executor.py" name="desk_cleaning_executor" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+    <param name="safety/dry_run" value="true"/>
+    <remap from="~detections" to="/mock_desk_perception/objects_out"/>
+    <remap from="~perception_ready" to="/mock_desk_perception/ready"/>
+  </node>
+
+  <node pkg="desk_cleaning" type="voice_task_planner.py" name="voice_task_planner" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+    <param name="llm/enabled" value="false"/>
+    <remap from="~text_input" to="/desk_cleaning/voice_text"/>
+  </node>
+
+  <node pkg="desk_cleaning" type="tts_feedback.py" name="desk_cleaning_tts" output="screen">
+    <param name="use_hardware" value="false"/>
+  </node>
+</launch>

@@ -1,0 +1,17 @@
+string[] allowed_classes
+string[] excluded_classes
+string destination
+uint16 max_objects
+bool announce_each
+---
+bool success
+uint16 completed_count
+string[] completed_objects
+string[] failed_objects
+string message
+---
+string state
+string current_object
+uint16 completed_count
+uint16 remaining_count
+string message

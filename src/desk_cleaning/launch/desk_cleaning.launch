@@ -1,0 +1,92 @@
+<launch>
+  <arg name="start_arm" default="true"/>
+  <arg name="dry_run" default="true"/>
+  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"/>
+  <!-- Default profile for Orbbec Astra Pro Plus ROS1/OpenNI drivers. -->
+  <arg name="color_topic" default="/astra/color/image_raw"/>
+  <arg name="depth_topic" default="/astra/depth/image_raw"/>
+  <arg name="camera_info_topic" default="/astra/color/camera_info"/>
+  <arg name="camera_frame" default="astra_color_optical_frame"/>
+  <arg name="perception_target_frame" default="base_link"/>
+  <arg name="use_hardware_asr" default="false"/>
+  <arg name="use_usb_asr" default="false"/>
+  <arg name="asr_model_path" default=""/>
+  <arg name="asr_whisper_executable" default="whisper-cli"/>
+  <arg name="asr_audio_device" default="default"/>
+  <arg name="use_hardware_tts" default="false"/>
+  <arg name="llm_enabled" default="false"/>
+  <arg name="llm_url" default="http://127.0.0.1:8080/v1/chat/completions"/>
+  <arg name="llm_backend" default="http"/>
+  <arg name="llm_model_path" default=""/>
+  <arg name="llm_context" default="2048"/>
+  <arg name="llm_threads" default="4"/>
+
+  <!-- Robot TF; the external camera TF is published by armpi_fpv_project.launch. -->
+  <param name="robot_description" textfile="$(find armpi_fpv_description)/urdf/armpi_fpv.urdf"/>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="desk_robot_state_publisher"/>
+
+  <group if="$(arg start_arm)">
+    <include file="$(find ros_robot_controller)/launch/ros_robot_controller_node.launch"/>
+    <include file="$(find hiwonder_servo_controllers)/launch/start.launch"/>
+    <include file="$(find armpi_fpv_kinematics)/launch/kinematics_node.launch"/>
+  </group>
+
+  <node pkg="desk_cleaning" type="desk_perception_node.py" name="desk_perception" output="screen">
+    <!-- The container's system OpenCV 4.2 cannot load YOLOv8 ONNX. Reuse the
+         already installed OpenCV 4.9 only for this Python perception node. -->
+    <env name="PYTHONPATH" value="/home/ubuntu/.local/lib/python3.8/site-packages:$(optenv PYTHONPATH)"/>
+    <rosparam file="$(find desk_cleaning)/config/perception.yaml" command="load"/>
+    <rosparam param="display_names">
+      toothbrush: 牙刷
+      spoon: 塑料勺
+      fork: 塑料叉
+      apple: 苹果
+      orange: 橙子
+      banana: 香蕉
+      remote: 遥控器
+    </rosparam>
+    <param name="model/path" value="$(arg model_path)"/>
+    <param name="camera/color_topic" value="$(arg color_topic)"/>
+    <param name="camera/depth_topic" value="$(arg depth_topic)"/>
+    <param name="camera/camera_info_topic" value="$(arg camera_info_topic)"/>
+    <param name="camera/target_frame" value="$(arg perception_target_frame)"/>
+  </node>
+
+  <node pkg="desk_cleaning" type="desk_cleaning_executor.py" name="desk_cleaning_executor" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+    <param name="safety/dry_run" value="$(arg dry_run)"/>
+    <remap from="~detections" to="/desk_perception/objects"/>
+    <remap from="~perception_ready" to="/desk_perception/ready"/>
+  </node>
+
+  <node pkg="desk_cleaning" type="voice_task_planner.py" name="voice_task_planner" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+    <param name="llm/enabled" value="$(arg llm_enabled)"/>
+    <param name="llm/url" value="$(arg llm_url)"/>
+    <param name="llm/backend" value="$(arg llm_backend)"/>
+    <param name="llm/model_path" value="$(arg llm_model_path)"/>
+    <param name="llm/context" value="$(arg llm_context)"/>
+    <param name="llm/threads" value="$(arg llm_threads)"/>
+    <remap from="~text_input" to="/desk_cleaning/voice_text"/>
+  </node>
+
+  <node pkg="desk_cleaning" type="tts_feedback.py" name="desk_cleaning_tts" output="screen">
+    <param name="use_hardware" value="$(arg use_hardware_tts)"/>
+  </node>
+
+  <node if="$(arg use_hardware_asr)" pkg="desk_cleaning" type="hardware_asr_bridge.py"
+        name="desk_cleaning_hardware_asr" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/asr.yaml" command="load"/>
+  </node>
+
+  <node if="$(arg use_usb_asr)" pkg="desk_cleaning" type="usb_whisper_asr_node.py"
+        name="usb_whisper_asr" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/whisper_asr.yaml" command="load"/>
+    <param name="device" value="$(arg asr_audio_device)"/>
+    <param name="whisper/executable" value="$(arg asr_whisper_executable)"/>
+    <param name="whisper/model_path" value="$(arg asr_model_path)"/>
+    <remap from="~text" to="/desk_cleaning/voice_text"/>
+  </node>
+</launch>

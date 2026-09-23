@@ -1,0 +1,42 @@
+objects:
+  toothbrush:
+    display_name: "牙刷"
+    aliases: ["牙刷", "toothbrush"]
+    grasp_profile: slim
+    enabled: true
+  spoon:
+    display_name: "塑料勺"
+    aliases: ["勺子", "塑料勺", "汤勺", "spoon"]
+    grasp_profile: slim
+    enabled: true
+  apple:
+    display_name: "苹果"
+    aliases: ["苹果", "仿真苹果", "apple"]
+    grasp_profile: small
+    enabled: true
+  orange:
+    display_name: "橙子"
+    aliases: ["橙子", "仿真橙子", "orange"]
+    grasp_profile: small
+    enabled: true
+  banana:
+    display_name: "香蕉"
+    aliases: ["香蕉", "banana"]
+    grasp_profile: small
+    enabled: true
+  fork:
+    display_name: "塑料叉"
+    aliases: ["叉子", "塑料叉", "fork"]
+    grasp_profile: slim
+    enabled: false
+  remote:
+    display_name: "遥控器"
+    aliases: ["遥控器", "remote"]
+    grasp_profile: flat
+    enabled: false
+
+destination_aliases:
+  default_tray: ["收纳盒", "盒子", "默认位置"]
+  left_tray: ["左边盒子", "左侧盒子", "左边"]
+  right_tray: ["右边盒子", "右侧盒子", "右边"]
+  apple_box: ["苹果盒", "放入盒子", "放到盒子", "apple box", "applebox"]

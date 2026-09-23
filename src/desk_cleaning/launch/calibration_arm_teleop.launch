@@ -1,0 +1,17 @@
+<launch>
+  <!-- Safety default: no servo command is published unless explicitly enabled. -->
+  <arg name="allow_motion" default="false"/>
+  <arg name="step_pulse" default="15"/>
+  <arg name="duration" default="1.0"/>
+  <arg name="minimum_pulse" default="100"/>
+  <arg name="maximum_pulse" default="900"/>
+
+  <node pkg="desk_cleaning" type="calibration_arm_teleop.py"
+        name="calibration_arm_teleop" output="screen">
+    <param name="allow_motion" value="$(arg allow_motion)"/>
+    <param name="step_pulse" value="$(arg step_pulse)"/>
+    <param name="duration" value="$(arg duration)"/>
+    <param name="minimum_pulse" value="$(arg minimum_pulse)"/>
+    <param name="maximum_pulse" value="$(arg maximum_pulse)"/>
+  </node>
+</launch>

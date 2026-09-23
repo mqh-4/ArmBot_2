@@ -1,0 +1,30 @@
+grasp_rate: 30.0
+anchor_rate: 20.0
+grasp_link: robot::grasping_frame
+fallback_grasp_link: robot::link5
+fallback_grasp_offset: [0.0, 0.0, 0.1126]
+max_attach_distance: 0.065
+robot_model: robot
+robot_pose: [0.0, 0.0, 0.002, 0.0, 0.0, 0.0]
+
+objects:
+  desk_pen:
+    class_name: pen
+    display_name: "签字笔"
+    size: [0.090, 0.012, 0.012]
+    grasp_yaw: 0.35
+  desk_eraser:
+    class_name: eraser
+    display_name: "橡皮"
+    size: [0.038, 0.024, 0.016]
+    grasp_yaw: 0.25
+  desk_notebook:
+    class_name: notebook
+    display_name: "便签本"
+    size: [0.055, 0.045, 0.012]
+    grasp_yaw: -0.22
+
+# Objects inside these collection zones disappear from the detector output.
+destination_regions:
+  - {x: 0.16, y: -0.13, radius: 0.065}
+  - {x: 0.16, y: 0.13, radius: 0.065}

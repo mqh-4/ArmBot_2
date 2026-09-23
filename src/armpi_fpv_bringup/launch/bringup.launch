@@ -8,11 +8,11 @@
     <!--运动学-->
     <include file="$(find armpi_fpv_kinematics)/launch/kinematics_node.launch"/>
 
-    <!--摄像头-->
-    <include file="$(find armpi_fpv_bringup)/launch/usb_cam.launch" />
-
-    <!--lab参数加载-->
-    <include file="$(find lab_config)/launch/lab_config_manager.launch" />
+    <!--
+      旧 USB 摄像头已停用。当前项目使用 Orbbec Astra Pro Plus，
+      由 orbbec_camera 单独启动，避免两个节点同时占用 /dev/video0。
+      usb_cam.launch 文件保留，可在需要标定旧摄像头时单独调用。
+    -->
 
     <!--位置校准参数-->
     <rosparam file="$(find armpi_fpv_bringup)/config/config.yaml" command="load"/>
@@ -25,14 +25,5 @@
         <arg name="unregister_timeout" value="3600000"/>
     </include>
 
-    <!--玩法-->
-    <node name="object_sorting" pkg="object_sorting" type="sorting.py" required="true" output="screen" />
-    <node name="object_tracking" pkg="object_tracking" type="tracking.py" required="true" output="screen" />
-    <node name="object_pallezting" pkg="object_pallezting" type="pallezting.py" required="true" output="screen" />
-
-    <node name="face_detect" pkg="face_detect" type="face.py" required="true" output="screen" />
-
-    <node name="in" pkg="warehouse" type="in.py" required="true" output="screen" />
-    <node name="out" pkg="warehouse" type="out.py" required="true" output="screen" />
-    <node name="exchange" pkg="warehouse" type="exchange.py" required="true" output="screen" />
+    <!-- 旧版 object_sorting/object_tracking/warehouse/face_detect 等玩法已移除。 -->
 </launch>

@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_truth_perception" default="true"/>
+  <arg name="model_path" default=""/>
+  <arg name="llm_enabled" default="false"/>
+  <arg name="llm_url" default="http://127.0.0.1:8080/v1/chat/completions"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find desk_cleaning)/worlds/desk_cleaning.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="use_sim_time" value="true"/>
+  </include>
+
+  <param name="robot_description" textfile="$(find armpi_fpv_description)/urdf/armpi_fpv.urdf"/>
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_armpi"
+        args="-urdf -param robot_description -model robot -x 0 -y 0 -z 0.002"
+        output="screen"/>
+  <rosparam file="$(find desk_cleaning)/config/gazebo_controllers.yaml" command="load"/>
+  <node pkg="controller_manager" type="spawner" name="gazebo_controller_spawner"
+        args="joint_state_controller joint1_position_controller joint2_position_controller joint3_position_controller joint4_position_controller joint5_position_controller r_joint_position_controller"
+        output="screen"/>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
+
+  <!-- The simulated optical frame is rigidly attached to the moving wrist camera link. -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="sim_astra_tf"
+        args="0 0 0 -1.570796 0 0 camera_link camera_rgb_optical_frame"/>
+
+  <include file="$(find armpi_fpv_kinematics)/launch/kinematics_node.launch"/>
+  <node pkg="desk_cleaning" type="sim_servo_bridge.py" name="sim_servo_bridge" output="screen">
+    <rosparam param="initial_pulses">[500, 625, 825, 80, 500]</rosparam>
+    <param name="initial_gripper_pulse" value="200"/>
+  </node>
+  <node pkg="desk_cleaning" type="sim_grasp_manager.py" name="sim_grasp_manager" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/gazebo.yaml" command="load"/>
+  </node>
+  <node pkg="desk_cleaning" type="sim_base_anchor.py" name="sim_base_anchor" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/gazebo.yaml" command="load"/>
+  </node>
+
+  <group if="$(arg use_truth_perception)">
+    <node pkg="desk_cleaning" type="sim_truth_perception_node.py" name="sim_truth_perception" output="screen">
+      <rosparam file="$(find desk_cleaning)/config/gazebo.yaml" command="load"/>
+    </node>
+    <node pkg="desk_cleaning" type="desk_cleaning_executor.py" name="desk_cleaning_executor" output="screen">
+      <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+      <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+      <param name="safety/dry_run" value="false"/>
+      <param name="simulation/enabled" value="true"/>
+      <remap from="~detections" to="/sim_truth_perception/objects_out"/>
+      <remap from="~perception_ready" to="/sim_truth_perception/ready"/>
+    </node>
+  </group>
+
+  <group unless="$(arg use_truth_perception)">
+    <node pkg="desk_cleaning" type="desk_perception_node.py" name="desk_perception" output="screen">
+      <rosparam file="$(find desk_cleaning)/config/perception.yaml" command="load"/>
+      <rosparam param="display_names">
+        pen: 签字笔
+        pencil: 铅笔
+        eraser: 橡皮
+        ruler: 尺子
+        scissors: 剪刀
+        stapler: 订书机
+        notebook: 便签本
+        phone: 手机
+        cup: 水杯
+      </rosparam>
+      <param name="model/path" value="$(arg model_path)"/>
+      <param name="camera/color_topic" value="/camera/rgb/image_raw"/>
+      <param name="camera/depth_topic" value="/camera/depth_registered/image_raw"/>
+      <param name="camera/camera_info_topic" value="/camera/rgb/camera_info"/>
+    </node>
+    <node pkg="desk_cleaning" type="desk_cleaning_executor.py" name="desk_cleaning_executor" output="screen">
+      <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+      <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+      <param name="safety/dry_run" value="false"/>
+      <param name="simulation/enabled" value="true"/>
+      <remap from="~detections" to="/desk_perception/objects"/>
+      <remap from="~perception_ready" to="/desk_perception/ready"/>
+    </node>
+  </group>
+
+  <node pkg="desk_cleaning" type="voice_task_planner.py" name="voice_task_planner" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam file="$(find desk_cleaning)/config/objects.yaml" command="load"/>
+    <param name="llm/enabled" value="$(arg llm_enabled)"/>
+    <param name="llm/url" value="$(arg llm_url)"/>
+    <remap from="~text_input" to="/desk_cleaning/voice_text"/>
+  </node>
+  <node pkg="desk_cleaning" type="tts_feedback.py" name="desk_cleaning_tts" output="screen">
+    <param name="use_hardware" value="false"/>
+  </node>
+</launch>

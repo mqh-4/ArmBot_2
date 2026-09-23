@@ -1,0 +1,8 @@
+# Python dependencies not provided by the ROS/Ubuntu packages in the Docker image.
+netaddr>=0.8,<2
+netifaces>=0.11,<1
+roslibpy>=1.8,<2
+smbus2>=0.4,<1
+ujson>=5.8,<6
+
+# face_detect and in-process LLM support require target-specific MediaPipe/llama.cpp builds.

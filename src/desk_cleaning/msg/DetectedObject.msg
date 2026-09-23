@@ -1,0 +1,14 @@
+string id
+string class_name
+string display_name
+float32 confidence
+int32 x_min
+int32 y_min
+int32 x_max
+int32 y_max
+geometry_msgs/Point position
+float32 grasp_yaw
+float32 size_x
+float32 size_y
+float32 size_z
+bool valid_depth

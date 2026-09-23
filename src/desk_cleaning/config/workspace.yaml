@@ -1,0 +1,196 @@
+base_frame: base_link
+
+perception:
+  eye_in_hand: false
+  observation_settle_time: 1.0
+
+# After releasing an object, require fresh RGB-D detections to show that it is
+# no longer at its original position. This is skipped automatically in dry_run.
+verification:
+  enabled: true
+  timeout: 3.0
+  required_frames: 3
+  position_tolerance: 0.035
+
+# The XY limits cover the full conservative reach envelope around base_link.
+# A radial profile removes the square's unreachable corners and follows the
+# measured IK reach as the gripper rises.  The low desk profile reaches about
+# 0.350 m in every direction; 0.345 m leaves approximately 5 mm for calibration
+# and object/depth noise.  The executor still performs an IK/FK check before
+# every real motion, so this is a broad candidate filter rather than a motion
+# bypass.
+workspace:
+  x_min: -0.345
+  x_max: 0.345
+  y_min: -0.345
+  y_max: 0.345
+  z_min: 0.00
+  z_max: 0.18
+  radial_reach:
+    # z is base_link height in metres; max is horizontal sqrt(x^2 + y^2).
+    - {z: 0.00, max: 0.345}
+    - {z: 0.05, max: 0.345}
+    - {z: 0.10, max: 0.345}
+    - {z: 0.15, max: 0.320}
+    - {z: 0.18, max: 0.300}
+
+# Put the detected object at the centre of the user's box.  These coordinates
+# are the box centre in base_link and should be updated after viewing the RGB-D
+# window with the box in its final position. The recorded marker plane is
+# z=0.04 m; the release target is raised to about z=0.115 m.
+destinations:
+  default_tray: {x: 0.16, y: -0.13, z: 0.03, yaw: 0.0}
+  left_tray: {x: 0.16, y: 0.13, z: 0.03, yaw: 0.0}
+  right_tray: {x: 0.16, y: -0.13, z: 0.03, yaw: 0.0}
+  # Red boundary detection supplies the current centre and boundary bbox.
+  # Refuse placement if the red boundary is missing; no fixed 10 cm radius is
+  # used for post-placement suppression.
+  apple_box:
+    x: -0.11
+    y: 0.25
+    z: 0.04
+    yaw: 0.0
+    marker_class: apple_box
+    box_height: 0.03
+    # Raise the release point above the rim after the previous 95 mm target
+    # brushed the edge: 40 mm marker plane + 30 mm box + 45 mm clearance.
+    release_clearance: 0.045
+    require_boundary: true
+    boundary_margin_px: 4
+    # Persistent 3-D no-regrasp area after the first successful release.
+    # This matches the configured box footprint without an extra expansion.
+    exclusion_half_extent_x: 0.12
+    exclusion_half_extent_y: 0.12
+    exclusion_margin: 0.00
+
+motion:
+  # desk_perception publishes base_link/TF coordinates. The legacy ArmPi IK
+  # library is rotated -90 degrees in XY; the executor applies this conversion
+  # before every IK request (grasp, lift, and destination).
+  # Perception publishes the estimated object center; no surface offset is
+  # added before generating the grasp waypoint.
+  grasp_z_offset: 0.000
+  # The orange depth estimate is currently about 20 mm above the fruit in
+  # this camera pose; lower only orange grasp waypoints while tuning it.
+  grasp_z_offset_by_class:
+    orange: -0.020
+    # Lower the banana grasp point to the measured fruit centre. This is
+    # intentionally class-specific because its depth is taken from a thin
+    # projected diameter rather than the spherical fruit model.
+    banana: -0.030
+  approach_height: 0.055
+  lift_height: 0.080
+  # Banana is long and must clear the box rim while being carried. Keep its
+  # lift and release waypoints below the 180 mm workspace ceiling.
+  lift_height_by_class:
+    banana: 0.150
+  release_height_offset_by_class:
+    banana: 0.060
+  # Used for ordinary trays only. apple_box uses box_height/release_clearance.
+  drop_height: 0.055
+  # IK preflight on the current calibrated camera pose found a stable
+  # solution around this downward-facing pitch. Keep the broad search range
+  # so low desk targets are not rejected before IK can choose the solution.
+  pitch: 60.0
+  pitch_min: -180.0
+  pitch_max: 180.0
+  open_pulse: 200
+  close_pulse: 560
+  # Lower r_joint pulses open the fingers farther.  Adaptive profiles use the
+  # detected physical object width plus a margin, then stay above the tested
+  # mechanical lower limit (about 33 pulses).
+  # Open well beyond the measured apple width. The tested safe lower pulse is
+  # about 33; keep 34 as the software limit to avoid the mechanical stop.
+  gripper_width_margin: 0.030
+  gripper_pulse_per_meter: 2000.0
+  min_open_pulse: 34
+  max_open_pulse: 220
+  # Open apples from their RGB-D diameter and add 18 mm clearance before
+  # descending.  The 70-pulse baseline is already wider than the previous
+  # fixed 160-pulse profile.
+  gripper_profiles:
+    apple:
+      adaptive_opening: true
+      open_pulse: 70
+      reference_width: 0.070
+      width_margin: 0.030
+      pulse_per_meter: 2000.0
+      min_open_pulse: 34
+      max_open_pulse: 100
+      close_pulse: 560
+    orange:
+      adaptive_opening: true
+      # Lower pulse values open the fingers wider. Start near the tested
+      # mechanical limit so a small orange is not pinched by the tips.
+      open_pulse: 45
+      reference_width: 0.070
+      width_margin: 0.035
+      pulse_per_meter: 2000.0
+      min_open_pulse: 34
+      max_open_pulse: 100
+      close_pulse: 560
+    banana:
+      adaptive_opening: true
+      width_dimension: min
+      open_pulse: 45
+      reference_width: 0.040
+      width_margin: 0.025
+      pulse_per_meter: 2000.0
+      min_open_pulse: 34
+      max_open_pulse: 100
+      close_pulse: 560
+  move_duration: 2.5
+  gripper_duration: 0.8
+  roll_by_class:
+    apple: 0.0
+    orange: 0.0
+  # The detector axis is the banana's long direction. Rotate the wrist by 90
+  # degrees so the gripper closes across the short diameter.
+  roll_offset_by_class:
+    banana: 90.0
+  # Keep the banana's short-side grasp orientation while carrying it to the
+  # box. Reusing the box yaw would rotate the banana upright at the rim.
+  preserve_grasp_roll_by_class: [banana]
+  # Joint1..joint5 pulses for a known collision-free observation pose.
+  home_pulses: [500, 625, 825, 80, 500]
+
+safety:
+  min_confidence: 0.55
+  # Small apples can score below the global threshold on the COCO model.
+  # Relax only the explicitly allowed fruit classes; workspace, depth, and IK
+  # checks remain active before any motion is sent to the arm.
+  min_confidence_by_class:
+    apple: 0.30
+    orange: 0.35
+    banana: 0.35
+  max_grasp_width: 0.075
+  # The banana detector bbox includes its curved body, so use the measured
+  # short side for this class while keeping the ordinary fruit limit intact.
+  # The current camera view can measure the banana short side at about 0.157 m;
+  # leave 23 mm for depth/bbox jitter while retaining the long-side limit.
+  max_grasp_width_by_class:
+    orange: 0.09
+    banana: 0.18
+  max_object_extent: 0.20
+  # Banana is long but is grasped across its narrow diameter. Keep the
+  # short-side width check above while allowing a longer detection extent.
+  max_object_extent_by_class:
+    banana: 0.30
+  detection_max_age: 1.5
+  detection_max_age_by_class:
+    apple: 3.0
+  scan_timeout: 8.0
+  box_boundary_wait_timeout: 8.0
+  # The Pi detector can take 2-3 seconds between valid apple detections.
+  minimum_scan_duration: 8.0
+  empty_confirmation_frames: 10
+  required_detection_frames: 3
+  # The COCO apple detector is intermittent on the Pi. A fresh, valid apple
+  # detection is still bounded by detection_max_age and workspace/IK checks.
+  required_detection_frames_by_class:
+    apple: 1
+    banana: 2
+  position_tolerance: 0.015
+  max_attempts_per_object: 2
+  settle_time: 0.8
+  dry_run: true

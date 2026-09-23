@@ -1,0 +1,29 @@
+# ALSA capture device. Use `arecord -L` to list valid names.
+device: default
+arecord_executable: arecord
+sample_rate: 16000
+channels: 1
+
+vad:
+  frame_ms: 30
+  rms_threshold: 550
+  start_ms: 90
+  silence_ms: 800
+  pre_roll_ms: 300
+  min_speech_ms: 300
+  max_speech_ms: 8000
+
+whisper:
+  # The launch file overrides these two values.
+  executable: ""
+  model_path: ""
+  language: zh
+  threads: 4
+  no_gpu: true
+  timeout_sec: 60.0
+
+# Ignore audio briefly after a TTS message so the robot does not hear itself.
+mute_during_tts: true
+tts_guard_sec: 3.0
+restart_delay_sec: 1.0
+min_text_chars: 1

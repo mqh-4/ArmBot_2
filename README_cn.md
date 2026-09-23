@@ -69,6 +69,7 @@ armpi_fpv/
 │   ├── armpi_fpv_kinematics/     # 运动学算法
 │   ├── armpi_fpv_moveit_config/  # MoveIt配置
 │   ├── asr_control/              # 语音控制模块
+│   ├── desk_cleaning/            # 桌面清理与Gazebo仿真
 │   ├── face_detect/              # 人脸检测
 │   ├── hiwonder_servo_controllers/ # 舵机控制器
 │   ├── hiwonder_servo_driver/    # 舵机硬件驱动
@@ -84,6 +85,16 @@ armpi_fpv/
 ├── devel/                        # 开发文件
 └── sources/                      # 资源和文档
 ```
+
+## 桌面清理扩展
+
+仓库中的 `desk_cleaning` ROS 包增加了 USB 麦克风与 whisper.cpp 离线语音识别、语音任务理解、
+YOLO ONNX 目标检测、RGB-D 三维定位、Gazebo 桌面仿真、自动抓放和逐件语音反馈。详细的
+语音、仿真、相机接入、标定、训练与运行说明见
+[`src/desk_cleaning/README_cn.md`](src/desk_cleaning/README_cn.md)。
+
+项目已附带一份可直接打印的 ChArUco 眼在手上标定板，位于
+[`sources/calibration/`](sources/calibration/)。
 
 ## 版本信息
 - **当前版本**: ArmPi FPV v1.0.0

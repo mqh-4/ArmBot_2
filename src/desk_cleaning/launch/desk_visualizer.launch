@@ -1,0 +1,21 @@
+<launch>
+  <arg name="image_topic" default="/astra/color/image_raw"/>
+  <arg name="objects_topic" default="/desk_perception/objects"/>
+  <arg name="window_name" default="ArmPi-FPV Camera"/>
+  <arg name="window_width" default="960"/>
+  <arg name="window_height" default="720"/>
+
+  <node pkg="desk_cleaning" type="desk_visualizer.py" name="desk_visualizer" output="screen">
+    <env name="DISPLAY" value="$(optenv DISPLAY :0)"/>
+    <env name="QT_X11_NO_MITSHM" value="1"/>
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="objects_topic" value="$(arg objects_topic)"/>
+    <param name="window_name" value="$(arg window_name)"/>
+    <param name="window_width" value="$(arg window_width)"/>
+    <param name="window_height" value="$(arg window_height)"/>
+    <param name="show_guide" value="false"/>
+    <param name="objects_timeout" value="8.0"/>
+    <rosparam file="$(find desk_cleaning)/config/workspace.yaml" command="load"/>
+    <rosparam param="target_classes">[toothbrush, spoon, apple, orange, banana]</rosparam>
+  </node>
+</launch>

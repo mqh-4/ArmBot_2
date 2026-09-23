@@ -1,0 +1,88 @@
+<!-- Single entry point for the ArmPi-FPV desk-cleaning project. -->
+<launch>
+  <arg name="start_arm" default="true"/>
+  <arg name="dry_run" default="true"/>
+  <arg name="model_path" default="/home/ubuntu/share/tmp/ArmPi-FPV/models/yolov8s.onnx"/>
+  <!-- Keep the external Astra frames separate from the legacy arm-mounted camera_link. -->
+  <arg name="camera_name" default="astra"/>
+  <arg name="color_topic" default="/astra/color/image_raw"/>
+  <arg name="depth_topic" default="/astra/depth/image_raw"/>
+  <arg name="camera_info_topic" default="/astra/color/camera_info"/>
+  <arg name="camera_root_frame" default="astra_link"/>
+  <arg name="camera_frame" default="astra_color_optical_frame"/>
+  <arg name="publish_eye_to_hand_tf" default="true"/>
+  <arg name="eye_to_hand_result" default="/home/ubuntu/share/tmp/ArmPi-FPV/output/eye_to_hand_result.json"/>
+  <arg name="depth_registration" default="true"/>
+  <arg name="enable_ir" default="false"/>
+  <arg name="enable_point_cloud" default="false"/>
+  <arg name="enable_colored_point_cloud" default="false"/>
+  <arg name="color_fps" default="30"/>
+  <arg name="depth_fps" default="30"/>
+  <arg name="perception_target_frame" default="base_link"/>
+  <arg name="use_hardware_asr" default="false"/>
+  <arg name="use_usb_asr" default="false"/>
+  <arg name="asr_model_path" default="/home/ubuntu/whisper.cpp/models/ggml-base-q5_1.bin"/>
+  <arg name="asr_whisper_executable" default="/home/ubuntu/whisper.cpp/build/bin/whisper-cli"/>
+  <arg name="asr_audio_device" default="plughw:3,0"/>
+  <arg name="visualizer" default="true"/>
+  <arg name="use_hardware_tts" default="false"/>
+  <arg name="llm_enabled" default="false"/>
+  <arg name="llm_url" default="http://127.0.0.1:8080/v1/chat/completions"/>
+  <arg name="llm_backend" default="http"/>
+  <arg name="llm_model_path" default=""/>
+
+  <!-- Core ArmPi services only; no legacy gameplay nodes. -->
+  <group if="$(arg start_arm)">
+    <include file="$(find ros_robot_controller)/launch/ros_robot_controller_node.launch"/>
+    <include file="$(find hiwonder_servo_controllers)/launch/start.launch"/>
+    <include file="$(find armpi_fpv_kinematics)/launch/kinematics_node.launch"/>
+  </group>
+
+  <!-- Astra Pro Plus: USB2-compatible stable profile. -->
+  <include file="$(find orbbec_camera)/launch/astra_pro_plus.launch">
+    <arg name="camera_name" value="$(arg camera_name)"/>
+    <arg name="depth_registration" value="$(arg depth_registration)"/>
+    <arg name="enable_ir" value="$(arg enable_ir)"/>
+    <arg name="enable_point_cloud" value="$(arg enable_point_cloud)"/>
+    <arg name="enable_colored_point_cloud" value="$(arg enable_colored_point_cloud)"/>
+    <arg name="color_fps" value="$(arg color_fps)"/>
+    <arg name="depth_fps" value="$(arg depth_fps)"/>
+  </include>
+
+  <group if="$(arg publish_eye_to_hand_tf)">
+    <node pkg="desk_cleaning" type="eye_to_hand_tf_publisher.py"
+          name="eye_to_hand_tf_publisher" output="screen" required="true">
+      <param name="result" value="$(arg eye_to_hand_result)"/>
+      <param name="base_frame" value="base_link"/>
+      <param name="camera_root_frame" value="$(arg camera_root_frame)"/>
+      <param name="camera_optical_frame" value="$(arg camera_frame)"/>
+    </node>
+  </group>
+
+  <include file="$(find desk_cleaning)/launch/desk_cleaning.launch">
+    <arg name="start_arm" value="false"/>
+    <arg name="dry_run" value="$(arg dry_run)"/>
+    <arg name="model_path" value="$(arg model_path)"/>
+    <arg name="color_topic" value="$(arg color_topic)"/>
+    <arg name="depth_topic" value="$(arg depth_topic)"/>
+    <arg name="camera_info_topic" value="$(arg camera_info_topic)"/>
+    <arg name="camera_frame" value="$(arg camera_frame)"/>
+    <arg name="perception_target_frame" value="$(arg perception_target_frame)"/>
+    <arg name="use_hardware_asr" value="$(arg use_hardware_asr)"/>
+    <arg name="use_usb_asr" value="$(arg use_usb_asr)"/>
+    <arg name="asr_model_path" value="$(arg asr_model_path)"/>
+    <arg name="asr_whisper_executable" value="$(arg asr_whisper_executable)"/>
+    <arg name="asr_audio_device" value="$(arg asr_audio_device)"/>
+    <arg name="use_hardware_tts" value="$(arg use_hardware_tts)"/>
+    <arg name="llm_enabled" value="$(arg llm_enabled)"/>
+    <arg name="llm_url" value="$(arg llm_url)"/>
+    <arg name="llm_backend" value="$(arg llm_backend)"/>
+    <arg name="llm_model_path" value="$(arg llm_model_path)"/>
+  </include>
+
+  <!-- Keep the RGB-D view visible while the arm is operating. -->
+  <include if="$(arg visualizer)" file="$(find desk_cleaning)/launch/desk_visualizer.launch">
+    <arg name="image_topic" value="$(arg color_topic)"/>
+    <arg name="objects_topic" value="/desk_perception/objects"/>
+  </include>
+</launch>

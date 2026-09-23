@@ -1,0 +1,13 @@
+<launch>
+  <arg name="model_path"/>
+  <arg name="whisper_executable" default="whisper-cli"/>
+  <arg name="audio_device" default="default"/>
+
+  <node pkg="desk_cleaning" type="usb_whisper_asr_node.py" name="usb_whisper_asr" output="screen">
+    <rosparam file="$(find desk_cleaning)/config/whisper_asr.yaml" command="load"/>
+    <param name="device" value="$(arg audio_device)"/>
+    <param name="whisper/executable" value="$(arg whisper_executable)"/>
+    <param name="whisper/model_path" value="$(arg model_path)"/>
+    <remap from="~text" to="/desk_cleaning/voice_text"/>
+  </node>
+</launch>
