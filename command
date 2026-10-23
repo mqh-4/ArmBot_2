@@ -169,20 +169,20 @@ rosservice call /exchange/exit "{}"
 
 #第13章 ArmPi FPV创意玩法课程\3.语音交互玩法课程
 #1.树莓派语音识别实验
-python3 /home/ubuntu/armpi_fpv/src/asr_control/scripts/asr_demo.py
+python3 /home/ubuntu/share/tmp/ArmBot/src/asr_control/scripts/asr_demo.py
 
 #2.树莓派语音合成实验
-python3 /home/ubuntu/armpi_fpv/src/asr_control/scripts/tts_demo.py
+python3 /home/ubuntu/share/tmp/ArmBot/src/asr_control/scripts/tts_demo.py
 
 #3.树莓派语音交互实验
-python3 /home/ubuntu/armpi_fpv/src/asr_control/scripts/interaction.py
+python3 /home/ubuntu/share/tmp/ArmBot/src/asr_control/scripts/interaction.py
 
 #第4课 语音播报垃圾分类
 python3 /home/ubuntu/course/vision_course/garbage_classification.py
 
 #第5课 语音控制色块分拣
 roslaunch armpi_fpv_bringup bringup.launch
-python3 /home/ubuntu/armpi_fpv/src/asr_control/scripts/asr_control_sorting.py
+python3 /home/ubuntu/share/tmp/ArmBot/src/asr_control/scripts/asr_control_sorting.py
 
 #第14章 群发控制课程
 #第2课 多台机械臂控制

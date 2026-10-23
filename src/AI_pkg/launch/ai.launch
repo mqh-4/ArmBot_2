@@ -1,0 +1,23 @@
+<launch>
+  <arg name="mcp_port" default="8765"/>
+  <arg name="ai_python" default="/opt/ai-python/bin/python"/>
+  <arg name="llm_base_url" default="https://api.deepseek.com/v1"/>
+  <arg name="llm_model" default="deepseek-flash"/>
+  <arg name="ready_topic" default="/desk_perception/ready"/>
+  <arg name="action_dir" default="$(find AI_pkg)/config/actions"/>
+
+  <node pkg="AI_pkg" type="mcp_server_node.py" name="mcp_server_node" output="screen"
+        launch-prefix="$(arg ai_python)">
+    <param name="host" value="127.0.0.1"/>
+    <param name="port" value="$(arg mcp_port)"/>
+    <param name="ready_topic" value="$(arg ready_topic)"/>
+    <param name="action_dir" value="$(arg action_dir)"/>
+  </node>
+  <node pkg="AI_pkg" type="llm_agent_node.py" name="llm_agent_node" output="screen"
+        launch-prefix="$(arg ai_python)">
+    <rosparam file="$(find AI_pkg)/config/agent.yaml" command="load"/>
+    <param name="mcp_url" value="http://127.0.0.1:$(arg mcp_port)/mcp"/>
+    <param name="llm/base_url" value="$(arg llm_base_url)"/>
+    <param name="llm/model" value="$(arg llm_model)"/>
+  </node>
+</launch>

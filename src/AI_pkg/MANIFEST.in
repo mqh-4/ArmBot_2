@@ -1,0 +1,9 @@
+include package.xml README.md requirements.txt
+recursive-include resource *
+recursive-include launch *.launch.py
+recursive-include config *.yaml
+exclude src/ai_pkg/voice_assistant.py
+exclude src/ai_pkg/voice_mcp_assistant.py
+exclude src/ai_pkg/mcp_server.py
+exclude src/ai_pkg/mcp_client.py
+exclude src/ai_pkg/math_question.py

@@ -32,9 +32,8 @@
   </group>
 
   <node pkg="desk_cleaning" type="desk_perception_node.py" name="desk_perception" output="screen">
-    <!-- The container's system OpenCV 4.2 cannot load YOLOv8 ONNX. Reuse the
-         already installed OpenCV 4.9 only for this Python perception node. -->
-    <env name="PYTHONPATH" value="/home/ubuntu/.local/lib/python3.8/site-packages:$(optenv PYTHONPATH)"/>
+    <!-- Keep the ROS system OpenCV 4.2 for other nodes; YOLO needs 4.9. -->
+    <env name="PYTHONPATH" value="/opt/opencv-4.9:$(optenv PYTHONPATH)"/>
     <rosparam file="$(find desk_cleaning)/config/perception.yaml" command="load"/>
     <rosparam param="display_names">
       apple: 苹果

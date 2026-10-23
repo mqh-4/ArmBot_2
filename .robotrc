@@ -17,14 +17,14 @@ echo -e "VERSION: \033[32m$VERSION\033[0m"
 echo -e "ROS_HOSTNAME: \033[32m$ROS_HOSTNAME\033[0m"
 echo -e "ROS_MASTER_URI: \033[32m$ROS_MASTER_URI\033[0m"
 
+WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 if [ $ZSH_VERSION ]; then
   . /opt/ros/noetic/setup.zsh
-  . $HOME/armpi_fpv/devel/setup.zsh
+  [ -f "$WORKSPACE_DIR/devel/setup.zsh" ] && . "$WORKSPACE_DIR/devel/setup.zsh"
 elif [ $BASH_VERSION ]; then
-  . /opt/ros_ws/noetic/setup.bash
-  . $HOME/armpi_fpv/devel/setup.bash
+  . /opt/ros/noetic/setup.bash
+  [ -f "$WORKSPACE_DIR/devel/setup.bash" ] && . "$WORKSPACE_DIR/devel/setup.bash"
 else
   . /opt/ros/noetic/setup.sh
-  . $HOME/armpi_fpv/devel/setup.sh
+  [ -f "$WORKSPACE_DIR/devel/setup.sh" ] && . "$WORKSPACE_DIR/devel/setup.sh"
 fi
-

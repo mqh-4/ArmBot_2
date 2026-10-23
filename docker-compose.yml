@@ -1,10 +1,19 @@
 services:
   armpi_fpv:
     image: armbot:noetic
+    # Restart the service after a host reboot unless it was explicitly stopped.
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
     network_mode: host
+    device_cgroup_rules:
+      # I2C bus for the ArmPi ASR (0x79) and TTS (0x40) modules.
+      - 'c 89:* rmw'
+      - 'c 189:* rmw'
+      - 'c 116:* rmw'
+      # Raspberry Pi UART used by the ArmPi servo controller (/dev/ttyAMA0).
+      - 'c 204:* rmw'
     environment:
       DISPLAY: ${DISPLAY:-:0}
     volumes:

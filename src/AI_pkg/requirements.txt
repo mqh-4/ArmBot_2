@@ -1,0 +1,11 @@
+# FastMCP 2.x requires Python >=3.10; do not install into Noetic's Python 3.8.
+fastmcp==2.14.7
+openai==2.54.0
+faster-whisper==1.2.1
+# Keep the CTranslate2 format/runtime aligned with the downloadable
+# faster-whisper model used by this ARM64 image.
+ctranslate2==4.5.0
+# Hub 2.x pulls httpx2, whose response decompressor is incompatible with the
+# model download path used by faster-whisper in this ARM64 runtime.
+huggingface-hub==0.27.1
+PyYAML>=6,<7

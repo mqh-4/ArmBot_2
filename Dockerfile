@@ -9,10 +9,10 @@ ENV ROS_DISTRO=noetic \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR ${ROS_WS}
 
-ADD https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc /tmp/ros.asc
+COPY ros1-latest-archive-keyring.gpg /usr/share/keyrings/ros1-latest-archive-keyring.gpg
 
-RUN gpg --dearmor --batch --yes -o /usr/share/keyrings/ros1-latest-archive-keyring.gpg /tmp/ros.asc \
-    && rm /tmp/ros.asc \
+RUN sed -i 's|http://ports.ubuntu.com/ubuntu-ports|https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports|g' /etc/apt/sources.list \
+    && sed -i 's|http://packages.ros.org/ros/ubuntu|https://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu|g' /etc/apt/sources.list.d/ros1-latest.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
@@ -30,6 +30,7 @@ RUN gpg --dearmor --batch --yes -o /usr/share/keyrings/ros1-latest-archive-keyri
         python3-pyqt5 \
         python3-serial \
         python3-smbus \
+        python3-tk \
         python3-yaml \
         ros-noetic-catkin \
         ros-noetic-camera-info-manager \
@@ -49,10 +50,19 @@ RUN gpg --dearmor --batch --yes -o /usr/share/keyrings/ros1-latest-archive-keyri
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./requirements.txt
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+RUN python3 -m pip install --no-cache-dir \
+    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    -r requirements.txt
+
+RUN python3 -m pip install --no-cache-dir --no-deps \
+    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    --target=/opt/opencv-4.9 opencv-python-headless==4.9.0.80
 
 COPY src/ ./src/
 RUN source /opt/ros/noetic/setup.bash \
     && catkin_make -j"${CATKIN_BUILD_JOBS}" -l"${CATKIN_BUILD_JOBS}"
+
+# FastMCP uses Python >=3.10; Noetic and the other nodes keep system Python 3.8.
+RUN bash src/AI_pkg/scripts/install_ai_runtime.sh
 
 CMD ["bash"]

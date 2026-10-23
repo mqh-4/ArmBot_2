@@ -1,6 +1,15 @@
 .git
 .vscode
 .marscode
+.aws
+.codex
+.agents
+.env
+.env.*
+resume/
+*.zip
+*.zip.sha256
+src/AI_pkg/config/actions/backups/
 **/__pycache__/
 **/*.py[cod]
 **/build/

@@ -1,0 +1,29 @@
+name: Verify ArmBot source and deployment inputs
+
+on: [push, pull_request]
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pure Python test dependencies
+        run: python -m pip install "numpy>=1.24,<2" "opencv-python-headless==4.9.0.80"
+      - name: Check deployment inputs (no ROS or hardware)
+        run: |
+          docker compose version
+          python tools/prepare_models.py --check
+          python tools/check_standalone.py
+      - name: Test fruit perception helpers
+        env:
+          PYTHONPATH: src/desk_cleaning/src
+        run: python -m unittest discover -s src/desk_cleaning/test -p 'test_*.py' -v
+      - name: Test verified model installation
+        run: python -m unittest discover -s tools -p 'test_*.py' -v
+      - name: Test motion teaching helpers
+        env:
+          PYTHONPATH: src/AI_pkg/src
+        run: python -m unittest discover -s src/AI_pkg/test -p 'test_teach.py' -v

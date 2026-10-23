@@ -10,6 +10,9 @@
   <arg name="camera_info_topic" default="/astra/color/camera_info"/>
   <arg name="camera_root_frame" default="astra_link"/>
   <arg name="camera_frame" default="astra_color_optical_frame"/>
+  <!-- Read calibration from the mounted project, including after container recreation. -->
+  <arg name="color_info_uri" default="file:///home/ubuntu/share/tmp/ArmBot/config/camera_info/astra_color.yaml"/>
+  <arg name="ir_info_uri" default="file:///home/ubuntu/share/tmp/ArmBot/config/camera_info/astra_ir.yaml"/>
   <arg name="publish_eye_to_hand_tf" default="true"/>
   <arg name="eye_to_hand_result" default="/home/ubuntu/share/tmp/ArmBot/output/eye_to_hand_result.json"/>
   <arg name="depth_registration" default="true"/>
@@ -41,6 +44,8 @@
   <!-- Astra Pro Plus: USB2-compatible stable profile. -->
   <include file="$(find orbbec_camera)/launch/astra_pro_plus.launch">
     <arg name="camera_name" value="$(arg camera_name)"/>
+    <arg name="color_info_uri" value="$(arg color_info_uri)"/>
+    <arg name="ir_info_uri" value="$(arg ir_info_uri)"/>
     <arg name="depth_registration" value="$(arg depth_registration)"/>
     <arg name="enable_ir" value="$(arg enable_ir)"/>
     <arg name="enable_point_cloud" value="$(arg enable_point_cloud)"/>

@@ -13,7 +13,8 @@ import tty
 import rospy
 
 from hiwonder_servo_msgs.msg import MultiRawIdPosDur, RawIdPosDur
-from hiwonder_servo_msgs.msg import ServoStateList
+from ros_robot_controller.msg import GetBusServoCmd
+from ros_robot_controller.srv import GetBusServoState
 
 
 class CalibrationArmTeleop:
@@ -44,17 +45,36 @@ class CalibrationArmTeleop:
             MultiRawIdPosDur,
             queue_size=1,
         )
-        rospy.Subscriber(
-            '/servo_controllers/port_id_1/servo_states',
-            ServoStateList,
-            self.state_callback,
-            queue_size=1,
+        # /servo_controllers/.../servo_states is fake feedback in this project
+        # (fake_read: true), so it reports goals, not the arm's real pose.
+        # Read the real encoder positions through the controller service.
+        self.get_state = rospy.ServiceProxy(
+            '/ros_robot_controller/bus_servo/get_state', GetBusServoState,
         )
+        try:
+            self.get_state.wait_for_service(timeout=5)
+            self.refresh_positions()
+        except rospy.ROSException:
+            rospy.logerr('servo state service unavailable; refusing to jog blindly')
+            raise SystemExit(1)
 
-    def state_callback(self, message):
-        for state in message.servo_states:
-            if int(state.id) in (2, 3, 4, 5, 6):
-                self.pulses[int(state.id)] = int(state.position)
+    def read_position(self, servo_id):
+        request = GetBusServoCmd()
+        request.id = servo_id
+        request.get_position = 1
+        try:
+            response = self.get_state([request]).state
+        except rospy.ServiceException:
+            return None
+        if response and response[0].position:
+            return int(response[0].position[0])
+        return None
+
+    def refresh_positions(self):
+        for servo_id in (2, 3, 4, 5, 6):
+            position = self.read_position(servo_id)
+            if position is not None:
+                self.pulses[servo_id] = position
 
     def print_help(self):
         rospy.loginfo(
@@ -86,8 +106,12 @@ class CalibrationArmTeleop:
         self.publish_positions(dict(self.pulses), 0.15)
 
     def jog(self, servo_id, direction, label):
+        # Always jog from the real current position, never from a stale goal.
+        position = self.read_position(servo_id)
+        if position is not None:
+            self.pulses[servo_id] = position
         if servo_id not in self.pulses:
-            rospy.logwarn('no state for servo %d yet; wait for servo feedback', servo_id)
+            rospy.logwarn('no state for servo %d yet; servo not responding', servo_id)
             return
         target = self.pulses[servo_id] + direction * self.step
         target = max(self.minimum, min(self.maximum, target))

@@ -23,7 +23,13 @@ setopt HIST_IGNORE_ALL_DUPS
 source $ZSH/plugins/powerlevel10k/powerlevel10k.zsh-theme
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOME/armpi_fpv/.robotrc
+for armbot_workspace in "${ROS_WS:-$HOME/share/tmp/ArmBot}" "$HOME/ArmBot" "$HOME/docker/tmp/ArmBot"; do
+  if [[ -r "$armbot_workspace/.robotrc" ]]; then
+    source "$armbot_workspace/.robotrc"
+    break
+  fi
+done
+unset armbot_workspace
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>AI_pkg</name>
+  <version>0.1.0</version>
+  <description>FastMCP tools and a recording/Whisper/LLM agent with ROS1 and ROS2 adapters.</description>
+  <maintainer email="maintainer@example.com">ArmBot Maintainer</maintainer>
+  <license>BSD-3-Clause</license>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_python</buildtool_depend>
+  <depend condition="$ROS_VERSION == 1">rospy</depend>
+  <depend condition="$ROS_VERSION == 2">rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <exec_depend>alsa-utils</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">ament_index_python</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">launch</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">launch_ros</exec_depend>
+  <test_depend condition="$ROS_VERSION == 1">python3-nose</test_depend>
+  <export>
+    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
+    <build_type condition="$ROS_VERSION == 2">ament_python</build_type>
+  </export>
+</package>

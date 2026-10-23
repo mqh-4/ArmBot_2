@@ -64,6 +64,34 @@ CATKIN_IGNORE
 *.caffemodel
 *.wts
 *.engine
+# Ship the exact default detector used by the fruit workflow (about 43 MiB).
+!/models/yolov8s.onnx
+/models/whisper-small/model.bin
+/models/**/*.part
+/models/**/*.download
+
+# Local historical session reports and generated presentation artifacts.
+/BUILD_AND_RUN_STATUS_CN.md
+/PROJECT_STATUS_AND_CODE_GUIDE_CN.md
+/armpi_learn.md
+/docs/preview-highlight.png
+/docs/*.pdf
+/docs/md2pdf.py
+/docs/项目亮点_CN.md
+/docs/项目详细介绍_CN.md
+/src/AI_pkg/config/actions/backups/
+*.zip
+*.zip.sha256
+.debug*.jpg
+
+# Runtime captures and local session data. Keep only the calibrated transform
+# required by the default launch file; all other output can be regenerated.
+/output/*
+!/output/eye_to_hand_result.json
+/tmp/*
+
+# Personal or presentation material is not part of the ROS runtime.
+/resume/
 
 # OS
 .DS_Store
@@ -71,6 +99,14 @@ Thumbs.db
 
 # IDE
 .vscode/
+.marscode/
+
+# Local credentials and agent state
+/.aws/
+/.codex/
+/.agents/
+.env.*
+!.env.example
 
 # Environments
 .env

@@ -1,0 +1,42 @@
+llm:
+  base_url: https://api.deepseek.com/v1
+  model: deepseek-flash
+  api_key_env: DEEPSEEK_API_KEY
+  timeout: 30.0
+  max_tool_rounds: 3
+  max_tokens: 512
+  reasoning_effort: ''
+  extra_body_json: '{}'
+  # 语音口令 -> 动作名（动作名对应 config/actions/<name>.bag）。
+  # 新增动作后在这里加一行即可走“直达”路径，不经过大模型。
+  motion_commands_json: '{"点头": "nod", "點頭": "nod", "请点头": "nod", "点个头": "nod", "摇头": "shake", "搖頭": "shake", "转圈": "circle", "轉圈": "circle", "转个圈": "circle", "转一圈": "circle"}'
+mcp_url: http://127.0.0.1:8765/mcp
+# A 69-second action at 0.25x speed, repeated 3 times, needs about 828 seconds.
+# Keep this independent from the model API timeout above.
+mcp_timeout: 900.0
+audio:
+  # C-Media USB PnP Sound Device; use the ALSA card name instead of a number.
+  device: plughw:Device,0
+  seconds: 5
+  max_seconds: 60
+whisper:
+  preload: true
+  beam_size: 1
+  cpu_threads: 4
+  # Trim only padding added around utterances <=8s; retain >=6s encoder context.
+  compact_encoder: true
+  # This directory is the host's models/whisper-small, mounted into the
+  # container at /home/ubuntu/share/tmp/ArmBot/models/whisper-small.
+  model: /home/ubuntu/share/tmp/ArmBot/models/whisper-small
+  language: zh
+  download_root: ''
+  local_files_only: true
+  hf_endpoint: https://hf-mirror.com
+system_prompt: >-
+  你是 ArmBot 中文语音助手。计算类问题必须调用工具，不能自行心算。
+  ROS 或相机状态必须通过查询工具确认。ready=true 只表示感知处理就绪，
+  不代表标定准确、机械臂已启动或实体抓取安全。用户说“点头/转圈/摇头”等明确动作时，
+  调用 play_motion，动作名必须取自 list_motion_actions 的 available 列表（例如 nod、circle）；
+  动作名称不明确或动作包不可用时，不得调用动作工具。兼容接口 play_nod/play_shake 仍可用。
+  动作播放一次最多 3 次，不能自行修改动作包路径或执行 shell 命令。
+  动作工具返回 started=true 只表示已启动，不表示完成；完成状态必须查询 list_motion_actions。
